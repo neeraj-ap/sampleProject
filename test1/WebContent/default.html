@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<form>
+			<input id = "testMesg" type = "text">
+			<input onclick = "sendMessage();" value = "Send Message" type="button"> 
+	</form>
+	
+	<textarea rows="10" cols="50" id = "messageTextArea"></textarea>
+	<script>
+			var websocket = new WebSocket("ws://localhost:8081/test1/test/");
+			var mesgtextArea = document.getElementById("messageTextArea");
+			websocket.onopen = function(message){ processOpen(message);};
+			websocket.onclose = function(message){ processClose(message);};
+			websocket.onerror = function(message){ processError(message);};
+			websocket.onmessage = function(message){ processMessage(message);};
+			
+			function processOpen(message){
+				mesgtextArea.value = "server connect . . . "+"\n";
+			}
+			
+			function processClose(message){
+				websocket.send("client disconnected");
+				mesgtextArea.value = "Server Disconnect . . . ."+"\n";
+			}
+			
+			function processError(message){
+				mesgtextArea.value = "error . . ."+"\n";
+			}
+			
+			function processMessage(message){
+				mesgtextArea.value = "server send = "+message.data+"\n";
+			} 
+			
+			function sendMessage(){
+				if(testMesg.value != "Close"){
+					websocket.send(testMesg.value);
+					mesgtextArea.value = "Client sends = "+testMesg.value+"\n";
+					testMesg.value = "";
+				}else websocket.close();
+			}
+	
+
+			function getData(e) {
+			    e.preventDefault();
+			}
+	</script>
+</body>
+</html>
